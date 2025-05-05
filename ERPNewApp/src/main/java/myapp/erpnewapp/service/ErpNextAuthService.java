@@ -2,7 +2,6 @@ package myapp.erpnewapp.service;
 
 
 import myapp.erpnewapp.model.ErpNextSessionInfo;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -14,8 +13,7 @@ import java.util.List;
 @Service
 public class ErpNextAuthService {
 
-    @Value("${erpnext.url}")
-    private String erpnextUrl;
+    private final String erpnextUrl = "http://erpnext.localhost:8000";
 
     private final RestTemplate restTemplate = new RestTemplate();
 
