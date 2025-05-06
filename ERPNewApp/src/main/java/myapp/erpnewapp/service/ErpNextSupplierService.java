@@ -10,6 +10,8 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Service
@@ -57,6 +59,28 @@ public class ErpNextSupplierService {
             return suppliers;
         } else {
             throw new Exception("Échec de la récupération des fournisseurs : " + response.getStatusCode());
+        }
+    }
+
+    public Supplier getSupplierByName(String name, String sid) throws Exception {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Cookie", "sid=" + sid);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        String url = erpnextUrl + "/api/resource/Supplier/" + URLEncoder.encode(name, StandardCharsets.UTF_8);
+
+        HttpEntity<String> request = new HttpEntity<>(headers);
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, request, String.class);
+
+        if (response.getStatusCode() == HttpStatus.OK) {
+            JsonNode data = objectMapper.readTree(response.getBody()).get("data");
+            Supplier supplier = new Supplier();
+            supplier.setName(data.path("name").asText());
+            supplier.setSupplierName(data.path("supplier_name").asText());
+            // ... autres champs
+            return supplier;
+        } else {
+            throw new Exception("Fournisseur non trouvé");
         }
     }
 

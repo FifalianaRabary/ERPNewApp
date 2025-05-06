@@ -35,11 +35,9 @@ public class  AuthController {
     ) {
         ErpNextSessionInfo info = erpNextService.loginAndGetSessionInfo(username, password);
         if (info != null) {
-            System.out.println("TSY NULL LAY IZYYYYYYYYYYYY");
             session.setAttribute("info", info);
             return "redirect:/home";
         }
-        System.out.println("NULL LAY IZYYYYYYYYYY");
         return "redirect:/login?error=true";
     }
 
