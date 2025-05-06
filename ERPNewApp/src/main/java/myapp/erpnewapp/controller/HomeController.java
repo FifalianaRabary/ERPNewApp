@@ -1,10 +1,11 @@
 package myapp.erpnewapp.controller;
 
+import myapp.erpnewapp.model.ErpNextSessionInfo;
+import myapp.erpnewapp.service.ErpNextSupplierService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import jakarta.servlet.http.HttpSession;
-import myapp.erpnewapp.model.ErpNextSessionInfo;
 
 @Controller
 public class HomeController {
@@ -14,7 +15,7 @@ public class HomeController {
         ErpNextSessionInfo info = (ErpNextSessionInfo) session.getAttribute("info");
         if (info == null) return "redirect:/login";
 
-        model.addAttribute("username", info.getFullName());
+        model.addAttribute("info", info);
         return "home";
     }
 }
