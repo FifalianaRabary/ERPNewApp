@@ -102,26 +102,30 @@ public class ErpNextPurchaseOrderService {
         headers.add("Cookie", "sid=" + sid);
         headers.setContentType(MediaType.APPLICATION_JSON);
     
-        String filters = "[[\"purchase_order\", \"=\", \"" + purchaseOrderName + "\"]]";
-        String fields = "[\"name\", \"status\"]";
-        String url = erpnextUrl + "/api/resource/Purchase Invoice?filters=" + filters + "&fields=" + fields;
-    
+        // Solution alternative qui n'utilise pas Purchase Invoice Item directement
+        String url = erpnextUrl + "/api/resource/Purchase Invoice?fields=[\"name\",\"status\",\"items.purchase_order\"]";
+        
         HttpEntity<String> request = new HttpEntity<>(headers);
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, request, String.class);
     
         if (response.getStatusCode() == HttpStatus.OK) {
-            JsonNode root = objectMapper.readTree(response.getBody());
-            JsonNode dataNode = root.get("data");
-    
-            for (JsonNode invoice : dataNode) {
-                String status = invoice.path("status").asText("");
-                if ("Paid".equalsIgnoreCase(status)) {
-                    return true; // Si au moins une facture est payée, on considère la commande payée
+            JsonNode data = objectMapper.readTree(response.getBody()).get("data");
+            for (JsonNode invoice : data) {
+                // Vérifier si la facture contient des items liés à la commande
+                JsonNode items = invoice.path("items");
+                if (items.isArray()) {
+                    for (JsonNode item : items) {
+                        String poName = item.path("purchase_order").asText();
+                        if (purchaseOrderName.equals(poName) && 
+                            "Paid".equalsIgnoreCase(invoice.path("status").asText(""))) {
+                            return true;
+                        }
+                    }
                 }
             }
             return false;
         } else {
-            throw new Exception("Erreur lors de la récupération des factures liées : " + response.getStatusCode());
+            throw new Exception("Erreur lors de la récupération des factures: " + response.getStatusCode());
         }
     }
     
