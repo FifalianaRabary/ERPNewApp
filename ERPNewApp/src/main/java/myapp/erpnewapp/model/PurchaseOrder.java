@@ -11,7 +11,11 @@ public class PurchaseOrder {
     private double per_billed;
     private String supplier; // ← ID du fournisseur (ex: "SUP-0002")
 
-    private boolean isPaid;
+    private boolean paid;
+
+    public void setPaid(boolean paid){
+        this.paid = paid;
+    }
 
     public String getName() {
         return name;
@@ -51,7 +55,7 @@ public class PurchaseOrder {
     }
 
     public String getPaymentStatus() {
-        return isPaid ? "Payé" : "Non payé";
+        return paid ? "Payé" : "Non payé";
     }
 
     public String getReceptionStatus() {
